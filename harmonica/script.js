@@ -224,165 +224,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 getHarpKey: function (key, position) {
                     return [
-                        {
-                            "id": "B1",
-                            "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+1"]),
-                            "classes": this.getHarpPosition(position, "+1")
-                        },
-                        {
-                            "id": "Db1",
-                            "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-1'"]),
-                            "classes": this.getHarpPosition(position, "-1'")
-                        },
-                        {
-                            "id": "D1", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-1"]),
-                            "classes": this.getHarpPosition(position, "-1")
-                        },
-                        {
-                            "id": "B2", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+2"]),
-                            "classes": this.getHarpPosition(position, "+2")
-                        },
-                        {
-                            "id": "Dbb2", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-2''"]),
-                            "classes": this.getHarpPosition(position, "-2''")
-                        },
-                        {
-                            "id": "Db2", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-2'"]),
-                            "classes": this.getHarpPosition(position, "-2'")
-                        },
-                        {
-                            "id": "D2", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-2"])
-                            , "classes": this.getHarpPosition(position, "-2")
-                        },
-                        {
-                            "id": "B3", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+3"])
-                            , "classes": this.getHarpPosition(position, "+3")
-                        },
-                        {
-                            "id": "Dbbb3", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-3'''"])
-                            , "classes": this.getHarpPosition(position, "-3'''")
-                        },
-                        {
-                            "id": "Dbb3", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-3''"]),
-                            "classes": this.getHarpPosition(position, "-3''")
-                        },
-                        {
-                            "id": "Db3", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-3'"]),
-                            "classes": this.getHarpPosition(position, "-3'")
-                        },
-                        {
-                            "id": "D3", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-3"]),
-                            "classes": this.getHarpPosition(position, "-3")
-                        },
-                        {
-                            "id": "B4", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+4"]),
-                            "classes": this.getHarpPosition(position, "+4")
-                        },
-                        {
-                            "id": "D4", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-4"]),
-                            "classes": this.getHarpPosition(position, "-4")
-                        },
-                        {
-                            "id": "B5", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+5"]),
-                            "classes": this.getHarpPosition(position, "+5")
-                        },
-                        {
-                            "id": "B6", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+6"]),
-                            "classes": this.getHarpPosition(position, "+6")
-                        },
-                        {
-                            "id": "B7", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+7"]),
-                            "classes": this.getHarpPosition(position, "+7")
-                        },
-                        {
-                            "id": "B8", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+8"]),
-                            "classes": this.getHarpPosition(position, "+8")
-                        },
-                        {
-                            "id": "B9", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+9"]),
-                            "classes": this.getHarpPosition(position, "+9")
-                        },
-                        {
-                            "id": "B10", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+10"]),
-                            "classes": this.getHarpPosition(position, "+10")
-                        },
-                        {
-                            "id": "D5", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-5"]),
-                            "classes": this.getHarpPosition(position, "-5")
-                        },
-                        {
-                            "id": "D6", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-6"]),
-                            "classes": this.getHarpPosition(position, "-6")
-                        },
-                        {
-                            "id": "D7", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-7"]),
-                            "classes": this.getHarpPosition(position, "-7")
-                        },
-                        {
-                            "id": "D8", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-8"]),
-                            "classes": this.getHarpPosition(position, "-8")
-                        },
-                        {
-                            "id": "D9", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-9"]),
-                            "classes": this.getHarpPosition(position, "-9")
-                        },
-                        {
-                            "id": "D10", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-10"]),
-                            "classes": this.getHarpPosition(position, "-10")
-                        },
-                        {
-                            "id": "Db4", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-4'"]),
-                            "classes": this.getHarpPosition(position, "-4'")
-                        },
-                        {
-                            "id": "Db6", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-6'"]),
-                            "classes": this.getHarpPosition(position, "-6'")
-                        },
-                        {
-                            "id": "Db7", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-7'"]),
-                            "classes": this.getHarpPosition(position, "-7'")
-                        },
-                        {
-                            "id": "Db9", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-9'"]),
-                            "classes": this.getHarpPosition(position, "-9'")
-                        },
-                        {
-                            "id": "Db10", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["-10'"]),
-                            "classes": this.getHarpPosition(position, "-10'")
-                        },
-                        {
-                            "id": "Bb1", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+1'"]),
-                            "classes": this.getHarpPosition(position, "+1'")
-                        },
-                        {
-                            "id": "Bb4", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+4'"]),
-                            "classes": this.getHarpPosition(position, "+4'")
-                        },
-                        {
-                            "id": "Bb5", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+5'"]),
-                            "classes": this.getHarpPosition(position, "+5'")
-                        },
-                        {
-                            "id": "Bb6", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+6'"]),
-                            "classes": this.getHarpPosition(position, "+6'")
-                        },
-                        {
-                            "id": "Bb8", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+8'"]),
-                            "classes": this.getHarpPosition(position, "+8'")
-                        },
-                        {
-                            "id": "Bb9", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+9'"]),
-                            "classes": this.getHarpPosition(position, "+9'")
-                        },
-                        {
-                            "id": "Bb10", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+10'"]),
-                            "classes": this.getHarpPosition(position, "+10'")
-                        },
-                        {
-                            "id": "Bbb10", "note": this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps["+10''"]),
-                            "classes": this.getHarpPosition(position, "+10''")
-                        },
-                    ];
+                        {"id":"B1", "note": "+1"},
+                        {"id":"Db1", "note": "-1'"},
+                        {"id":"D1", "note": "-1"},
+                        {"id":"B2", "note": "+2"},
+                        {"id":"Dbb2", "note": "-2''"},
+                        {"id":"Db2", "note": "-2'"},
+                        {"id":"D2", "note": "-2"},
+                        {"id":"B3", "note": "+3"},
+                        {"id":"Dbbb3", "note": "-3'''"},
+                        {"id":"Dbb3", "note": "-3''"},
+                        {"id":"Db3", "note": "-3'"},
+                        {"id":"D3", "note": "-3"},
+                        {"id":"B4", "note": "+4"},
+                        {"id":"D4", "note": "-4"},
+                        {"id":"B5", "note": "+5"},
+                        {"id":"B6", "note": "+6"},
+                        {"id":"B7", "note": "+7"},
+                        {"id":"B8", "note": "+8"},
+                        {"id":"B9", "note": "+9"},
+                        {"id":"B10", "note": "+10"},
+                        {"id":"D5", "note": "-5"},
+                        {"id":"D6", "note": "-6"},
+                        {"id":"D7", "note": "-7"},
+                        {"id":"D8", "note": "-8"},
+                        {"id":"D9", "note": "-9"},
+                        {"id":"D10", "note": "-10"},
+                        {"id":"Db4", "note": "-4'"},
+                        {"id":"Db6", "note": "-6'"},
+                        {"id":"Db7", "note": "-7'"},
+                        {"id":"Db9", "note": "-9'"},
+                        {"id":"Db10", "note": "-10'"},
+                        {"id":"Bb1", "note": "+1'"},
+                        {"id":"Bb4", "note": "+4'"},
+                        {"id":"Bb5", "note": "+5'"},
+                        {"id":"Bb6", "note": "+6'"},
+                        {"id":"Bb8", "note": "+8'"},
+                        {"id":"Bb9", "note": "+9'"},
+                        {"id":"Bb10", "note": "+10'"},
+                        {"id":"Bbb10", "note": "+10''"},
+                    ].map(spec => ({
+                            id: spec.id,
+                            note: this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps[spec.note]),
+                            classes: this.getHarpPosition(position, spec.note)
+                    }));
                 },
             }
             var position = document.getElementById('selected-position');
