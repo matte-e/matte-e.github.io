@@ -1,0 +1,210 @@
+#container {
+    margin: 100px;
+    padding: 20px;
+}
+
+.harpcontainer {
+    float: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.noteRow {
+    display: flex;
+    flex-direction: row;
+}
+
+/* .overblowWS {
+    background-color: rgb(255, 96, 96, 0.1);
+}
+
+.overblowHS {
+    background-color: rgba(211, 185, 101, 0.1);
+}
+
+.blownotes {
+    background-color: rgba(169, 200, 96, 0.1);
+}
+
+.numbers {
+    background-color: rgba(169, 169, 169, 1);
+}
+
+.drawnotes {
+    background-color: rgba(169, 200, 96, 0.1);
+}
+
+.bendHS {
+    background-color: rgba(211, 185, 101, 0.1);
+}
+
+.bendWS {
+    background-color: rgba(96, 170, 255, 0.1);
+}
+
+.bendWHS {
+    background-color: rgba(255, 96, 242, 0.1);
+} */
+
+.square {
+    width: 60px;
+    height: 40px;
+    border-style: solid;
+    border-width: 5px;
+    font-weight: bolder;
+    border-color: rgba(123, 32, 40, 0);
+    margin: 3px;
+}
+
+.hole {
+    border-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.note {
+    border-color: rgba(0, 0, 0, .1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.dropdown {
+    width: 200px;
+    position: relative;
+    margin: 3px 20px;
+}
+
+.dropdown-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+.dropdown_label {
+    font-size: 16px;
+    font-weight: bold;
+    padding: 25px;
+}
+
+.dropdown-content div {
+    padding: 2px;
+    cursor: pointer;
+}
+
+.dropdown-content div:hover {
+    background-color: #f3fff0;
+}
+
+.mode-name {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.mode-interval {
+    font-size: 12px;
+}
+
+.position-name {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.position-scales {
+    font-size: 12px;
+} 
+
+.bends {
+    width: 60px;
+    height: 40px;
+    border: 5px solid grey;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(119, 119, 226);
+    color: black;
+    margin: 2px;
+  }
+
+  .overblows {
+    width: 60px;
+    height: 40px;
+    border: 5px solid grey;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(221, 189, 131);
+    color: black;
+    margin: 2px;
+  }
+
+.PO {
+    background-color: rgb(255, 255, 255);
+}
+
+.m2 {
+    background-color: rgb(139, 0, 0, 0.2)
+}
+
+.MJ2 {
+    background-color: rgb(255, 165, 0, 0.2);
+}
+
+.m3 {
+    background-color: rgb(75, 0, 130, 0.2);
+}
+
+.MJ3 {
+    background-color: rgb(255, 255, 0, 0.2);
+}
+
+.P4 {
+    background-color: rgb(0, 128, 0, 0.2);
+}
+
+.A4_D5_tritone {
+    background-color: rgb(0, 255, 255, 0.2);
+}
+
+.P5 {
+    background-color: rgb(135, 206, 235, 0.2);
+}
+
+.m6 {
+    background-color: rgb(148, 0, 211, 0.2);
+}
+
+.MJ6 {
+    background-color: rgb(255, 223, 0, 0.2);
+}
+
+.m7 {
+    background-color: rgb(128, 0, 32, 0.2);
+}
+
+.MJ7 {
+    background-color: rgb(255, 105, 180, 0.2);
+}
+
+.highlight {
+    border: 5px solid blue;
+}
