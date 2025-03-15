@@ -1,4 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    const LAYOUT = [
+        {maxB: 2, maxD: 2},
+        {maxB: 1, maxD: 3},
+        {maxB: 1, maxD: 4},
+        {maxB: 2, maxD: 2},
+        {maxB: 2, maxD: 1},
+        {maxB: 2, maxD: 2},
+        {maxB: 1, maxD: 2},
+        {maxB: 2, maxD: 1},
+        {maxB: 2, maxD: 2},
+        {maxB: 3, maxD: 2},
+    ];
+    
+    const LAYOUT_IDS = LAYOUT.flatMap(({maxB, maxD}, hole) => {
+        idFor = (type, sign, overblow) => ({
+            id: type + 'b'.repeat(overblow) + (hole + 1),
+            hole: sign + (hole + 1) + "'".repeat(overblow),
+        });
+        const result = [];
+        for(let i = 0; i < maxB; i++) {
+            result.push(idFor('B', '+', i));
+        }
+        for(let i = 0; i < maxD; i++) {
+            result.push(idFor('D', '-', i));
+        }
+        return result;
+    });
+
     console.log('Hello World');
     harp_layout = {
         init: () => {
@@ -223,34 +252,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     return harp_layout.chromatic_notes_array[(harp_layout.chromatic_notes_c[note] + half_tone_steps) % 12];
                 },
                 getHarpKey: function (key, position) {
-                    return [
-                        {maxB: 2, maxD: 2},
-                        {maxB: 1, maxD: 3},
-                        {maxB: 1, maxD: 4},
-                        {maxB: 2, maxD: 2},
-                        {maxB: 2, maxD: 1},
-                        {maxB: 2, maxD: 2},
-                        {maxB: 1, maxD: 2},
-                        {maxB: 2, maxD: 1},
-                        {maxB: 2, maxD: 2},
-                        {maxB: 3, maxD: 2},
-                    ].flatMap((holeSpec, index) => {
-                        const result = [];
-                        for(let i = 0; i < holeSpec.maxB; i++) {
-                            result.push("B" + 'b'.repeat(i) + (index + 1));
-                        }
-                        for(let i = 0; i < holeSpec.maxD; i++) {
-                            result.push("D" + 'b'.repeat(i) + (index + 1));
-                        }
-                        return result;
-                    })
-                    .map(id => ({id, hole: (id[0]==='B'?'+':'-') + id.replace(/[A-Za-z]+/, '') + id.replaceAll(/[BD0-9]+/g, '').replaceAll(/b/g, "'")}))
+                    return LAYOUT_IDS
                     .map(({id, hole}) => ({
                             id,
                             note: this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps[hole]),
                             classes: this.getHarpPosition(position, hole)
-                    })
-                    );
+                    }));
                 },
             }
             var position = document.getElementById('selected-position');
