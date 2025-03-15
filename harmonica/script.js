@@ -14,16 +14,17 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
     
     const LAYOUT_IDS = LAYOUT_SCHEME.map(({maxB, maxD}, hole) => {
-        idFor = (type, sign, overblow) => ({
+        const result = [];
+        pushId = (type, sign, overblow) => {
+            result.push({
             id: type + 'b'.repeat(overblow) + (hole + 1),
             hole: sign + (hole + 1) + "'".repeat(overblow),
-        });
-        const result = [];
+        })};
         for(let i = 0; i < maxB; i++) {
-            result.push(idFor('B', '+', i));
+            pushId('B', '+', i);
         }
         for(let i = 0; i < maxD; i++) {
-            result.push(idFor('D', '-', i));
+            pushId('D', '-', i);
         }
         return result;
     });
