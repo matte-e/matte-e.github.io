@@ -39,11 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
         Bb10: "bends",
     };
 
-    function getLayoutHoles(overblow) {
-        const type = (overblow > 0 ? 'B' : 'D') + 'b'.repeat(Math.abs(overblow)-1);
+    function getLayoutHoles(blow) {
+        const type = (blow > 0 ? 'B' : 'D') + 'b'.repeat(Math.abs(blow)-1);
         const result = [];
         LAYOUT_SCHEME.forEach(({maxB, maxD}, idx) => {
-            if(overblow <= maxB && -overblow <= maxD) {
+            if(blow <= maxB && -blow <= maxD) {
                 const id = type + (idx + 1);
                 const classes = ["note"];
                 if(id in SPECIAL_LAYOUT_CLASSES) {
