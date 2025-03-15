@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         {maxB: 3, maxD: 2},
     ];
     
-    const LAYOUT_IDS = LAYOUT_SCHEME.map(({maxB, maxD}, hole) => {
+    const LAYOUT_IDS = LAYOUT_SCHEME.flatMap(({maxB, maxD}, hole) => {
         const result = [];
         pushId = (type, sign, overblow) => {
             result.push({
@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return harp_layout.chromatic_notes_array[(harp_layout.chromatic_notes_c[note] + half_tone_steps) % 12];
                 },
                 getHarpKey: function (key, position) {
-                    return LAYOUT_IDS.flatMap(x=>x)
+                    return LAYOUT_IDS
                     .map(({id, hole}) => ({
                             id,
                             note: this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps[hole]),
