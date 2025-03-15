@@ -223,7 +223,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     return harp_layout.chromatic_notes_array[(harp_layout.chromatic_notes_c[note] + half_tone_steps) % 12];
                 },
                 getHarpKey: function (key, position) {
-                    return ["B1","Db1","D1","B2","Dbb2","Db2","D2","B3","Dbbb3","Dbb3","Db3","D3","B4","D4","B5","B6","B7","B8","B9","B10","D5","D6","D7","D8","D9","D10","Db4","Db6","Db7","Db9","Db10","Bb1","Bb4","Bb5","Bb6","Bb8","Bb9","Bb10","Bbb10",]
+                    return [
+                        {maxB: 2, maxD: 2},
+                        {maxB: 1, maxD: 3},
+                        {maxB: 1, maxD: 4},
+                        {maxB: 2, maxD: 2},
+                        {maxB: 2, maxD: 1},
+                        {maxB: 2, maxD: 2},
+                        {maxB: 1, maxD: 2},
+                        {maxB: 2, maxD: 1},
+                        {maxB: 2, maxD: 2},
+                        {maxB: 3, maxD: 2},
+                    ].flatMap((holeSpec, index) => {
+                        const result = [];
+                        for(let i = 0; i < holeSpec.maxB; i++) {
+                            result.push("B" + 'b'.repeat(i) + (index + 1));
+                        }
+                        for(let i = 0; i < holeSpec.maxD; i++) {
+                            result.push("D" + 'b'.repeat(i) + (index + 1));
+                        }
+                        return result;
+                    })
                     .map(id => ({id, hole: (id[0]==='B'?'+':'-') + id.replace(/[A-Za-z]+/, '') + id.replaceAll(/[BD0-9]+/g, '').replaceAll(/b/g, "'")}))
                     .map(({id, hole}) => ({
                             id,
