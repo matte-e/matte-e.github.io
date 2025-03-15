@@ -15,12 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const LAYOUT_IDS = LAYOUT_SCHEME.flatMap(({maxB, maxD}, hole) => {
         const result = [];
-        pushId = (type, sign, overblow) => result.push({
+        const pushId = (type, sign) => overblow => result.push({
             id: type + 'b'.repeat(overblow) + (hole + 1),
             hole: sign + (hole + 1) + "'".repeat(overblow),
         });
-        Array(maxB).keys().forEach(overblow => pushId('B', '+', overblow));
-        Array(maxD).keys().forEach(overblow => pushId('D', '-', overblow));
+        Array(maxB).keys().forEach(pushId('B', '+'));
+        Array(maxD).keys().forEach(pushId('D', '-'));
         return result;
     });
 
