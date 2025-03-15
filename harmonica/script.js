@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const LAYOUT = [
+    const LAYOUT_SCHEME = [
         {maxB: 2, maxD: 2},
         {maxB: 1, maxD: 3},
         {maxB: 1, maxD: 4},
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         {maxB: 3, maxD: 2},
     ];
     
-    const LAYOUT_IDS = LAYOUT.flatMap(({maxB, maxD}, hole) => {
+    const LAYOUT_IDS = LAYOUT_SCHEME.map(({maxB, maxD}, hole) => {
         idFor = (type, sign, overblow) => ({
             id: type + 'b'.repeat(overblow) + (hole + 1),
             hole: sign + (hole + 1) + "'".repeat(overblow),
@@ -27,6 +27,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return result;
     });
+
+    const SPECIAL_LAYOUT_CLASSES = {
+        Bbb10: "bends",
+        Bb1: "overblow",
+        Bb4: "overblow",
+        Bb5: "overblow",
+        Bb6: "overblow",
+        Bb8: "bends",
+        Bb9: "bends",
+        Bb10: "bends",
+    };
+
+    function getLayoutHoles(overblow) {
+        const type = (overblow > 0 ? 'B' : 'D') + 'b'.repeat(Math.abs(overblow)-1);
+        const result = [];
+        LAYOUT_SCHEME.forEach(({maxB, maxD}, idx) => {
+            if(overblow <= maxB && -overblow <= maxD) {
+                const id = type + (idx + 1);
+                const classes = ["note"];
+                if(id in SPECIAL_LAYOUT_CLASSES) {
+                    classes.push(SPECIAL_LAYOUT_CLASSES[id]);
+                }
+                result.push({id, idx, classes});
+            }
+        })
+        return result;
+    };
+    
+    const LAYOUT = {
+        WSoverblow: getLayoutHoles(3),
+        HSoverblow: getLayoutHoles(2),
+        BlowNotes: getLayoutHoles(1),
+        DrawNotes: getLayoutHoles(-1),
+        HSBendNotes: getLayoutHoles(-2),
+        WSBendNotes: getLayoutHoles(-3),
+        WHSBendNotes: getLayoutHoles(-4),
+    };
 
     console.log('Hello World');
     harp_layout = {
@@ -252,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return harp_layout.chromatic_notes_array[(harp_layout.chromatic_notes_c[note] + half_tone_steps) % 12];
                 },
                 getHarpKey: function (key, position) {
-                    return LAYOUT_IDS
+                    return LAYOUT_IDS.flatMap(x=>x)
                     .map(({id, hole}) => ({
                             id,
                             note: this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps[hole]),
@@ -311,57 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         },
-        layout: {
-            WSoverblow: [{
-                id: 'Bbb10',
-                idx: 9,
-                classes: ["note", "bends"]
-            }],
-            HSoverblow: [
-                { id: 'Bb1', idx: 0, classes: ["note", "overblow"] },
-                { id: 'Bb4', idx: 3, classes: ["note", "overblow"] },
-                { id: 'Bb5', idx: 4, classes: ["note", "overblow"] },
-                { id: 'Bb6', idx: 5, classes: ["note", "overblow"] },
-                { id: 'Bb8', idx: 7, classes: ["note", "bends"] },
-                { id: 'Bb9', idx: 8, classes: ["note", "bends"] },
-                { id: 'Bb10', idx: 9, classes: ["note", "bends"] }],
-            BlowNotes: [
-                { id: 'B1', idx: 0, classes: ["note"] },
-                { id: 'B2', idx: 1, classes: ["note"] },
-                { id: 'B3', idx: 2, classes: ["note"] },
-                { id: 'B4', idx: 3, classes: ["note"] },
-                { id: 'B5', idx: 4, classes: ["note"] },
-                { id: 'B6', idx: 5, classes: ["note"] },
-                { id: 'B7', idx: 6, classes: ["note"] },
-                { id: 'B8', idx: 7, classes: ["note"] },
-                { id: 'B9', idx: 8, classes: ["note"] },
-                { id: 'B10', idx: 9, classes: ["note"] }],
-            DrawNotes: [
-                { id: 'D1', idx: 0, classes: ["note"] },
-                { id: 'D2', idx: 1, classes: ["note"] },
-                { id: 'D3', idx: 2, classes: ["note"] },
-                { id: 'D4', idx: 3, classes: ["note"] },
-                { id: 'D5', idx: 4, classes: ["note"] },
-                { id: 'D6', idx: 5, classes: ["note"] },
-                { id: 'D7', idx: 6, classes: ["note"] },
-                { id: 'D8', idx: 7, classes: ["note"] },
-                { id: 'D9', idx: 8, classes: ["note"] },
-                { id: 'D10', idx: 9, classes: ["note"] }],
-            HSBendNotes: [
-                { id: 'Db1', idx: 0, classes: ["note"] },
-                { id: 'Db2', idx: 1, classes: ["note"] },
-                { id: 'Db3', idx: 2, classes: ["note"] },
-                { id: 'Db4', idx: 3, classes: ["note"] },
-                { id: 'Db6', idx: 5, classes: ["note"] },
-                { id: 'Db7', idx: 6, classes: ["note"] },
-                { id: 'Db9', idx: 8, classes: ["note"] },
-                { id: 'Db10', idx: 9, classes: ["note"] }],
-            WSBendNotes: [
-                { id: 'Dbb2', idx: 1, classes: ["note"] },
-                { id: 'Dbb3', idx: 2, classes: ["note"] }],
-            WHSBendNotes: [
-                { id: 'Dbbb3', idx: 2, classes: ["note"] }],
-        },
+        layout: LAYOUT,
         chromatic_notes_array: ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"],
         chromatic_notes_c: {
             "C": 0,
