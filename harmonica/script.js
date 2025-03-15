@@ -279,12 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
             data.getHarpKey(key, position).forEach(note => {
                 console.log('note', note);
                 var curr = document.getElementById(note.id);
-                if (!note.note) {
-                    curr.innerText = note.classes;
-                }
-                else {
-                    curr.innerText = note.note;
-                }
+                curr.innerText = note.note || note.classes;
                 curr.classList.add(note.classes);
             });
             console.log(mode);
