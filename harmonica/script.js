@@ -15,32 +15,32 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const LAYOUT_IDS = LAYOUT_SCHEME.flatMap(({maxB, maxD}, hole) => {
         const result = [];
-        const pushId = (type, sign) => overblow => result.push({
-            id: type + 'b'.repeat(overblow) + (hole + 1),
-            hole: sign + (hole + 1) + "'".repeat(overblow),
-        });
-        Array(maxB).keys().forEach(pushId('B', '+'));
-        Array(maxD).keys().forEach(pushId('D', '-'));
+        const pushId = sign => overblow => result.push(
+            sign + (hole + 1) + "'".repeat(overblow)
+        );
+        Array(maxB).keys().forEach(pushId('+'));
+        Array(maxD).keys().forEach(pushId('-'));
         return result;
     });
 
     const SPECIAL_LAYOUT_CLASSES = {
-        Bbb10: "bends",
-        Bb1: "overblow",
-        Bb4: "overblow",
-        Bb5: "overblow",
-        Bb6: "overblow",
-        Bb8: "bends",
-        Bb9: "bends",
-        Bb10: "bends",
+        "+10''": "bends",
+        "+1'": "overblow",
+        "+4'": "overblow",
+        "+5'": "overblow",
+        "+6'": "overblow",
+        "+8'": "bends",
+        "+9'": "bends",
+        "+10'": "bends",
     };
 
     function getLayoutHoles(blow) {
-        const type = (blow > 0 ? 'B' : 'D') + 'b'.repeat(Math.abs(blow)-1);
+        const sign = (blow > 0) ? '+' : '-';
+        const overblow = "'".repeat(Math.abs(blow)-1);
         const result = [];
         LAYOUT_SCHEME.forEach(({maxB, maxD}, idx) => {
             if(blow <= maxB && -blow <= maxD) {
-                const id = type + (idx + 1);
+                const id = sign + (idx + 1) + overblow;
                 const classes = ["note"];
                 if(id in SPECIAL_LAYOUT_CLASSES) {
                     classes.push(SPECIAL_LAYOUT_CLASSES[id]);
@@ -286,10 +286,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 getHarpKey: function (key, position) {
                     return LAYOUT_IDS
-                    .map(({id, hole}) => ({
+                    .map(id => ({
                             id,
-                            note: this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps[hole]),
-                            classes: this.getHarpPosition(position, hole)
+                            note: this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps[id]),
+                            classes: this.getHarpPosition(position, id)
                     }));
                 },
             }
