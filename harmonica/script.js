@@ -1,17 +1,53 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const RICHTER_TUNING = [
-        {blow: [0, 3], draw: [2, 1]},
-        {blow: [4], draw: [7, 6, 5]},
-        {blow: [7], draw: [11, 10, 9, 8]},
-        {blow: [12, 15], draw: [14, 13]},
-        {blow: [16, 18], draw: [17]},
-        {blow: [19, 22], draw: [21, 20]},
-        {blow: [24], draw: [23, 25]},
-        {blow: [28, 27], draw: [26]},
-        {blow: [31, 30], draw: [29, 32]},
-        {blow: [36, 35, 34], draw: [33, 37]},
+        { blow: 0, draw: 2},
+        { blow: 4, draw: 7},
+        { blow: 7, draw: 11},
+        { blow: 12, draw: 14},
+        { blow: 16, draw: 17},
+        { blow: 19, draw: 21},
+        { blow: 24, draw: 23},
+        { blow: 28, draw: 26},
+        { blow: 31, draw: 29},
+        { blow: 36, draw: 33},
     ];
+
+    const FULL_TUNING = (() => {
+        // add base and bend notes
+        const result = RICHTER_TUNING.map(({blow, draw}) => {
+            const blows = [blow];
+            const draws = [draw];
+            for(let bend = blow - 1; bend > draw; bend--) {
+                blows.push(bend);
+            }
+            for(let bend = draw - 1; bend > blow; bend--) {
+                draws.push(bend);
+            }
+            return {blows, draws};
+        });
+        // collect all notes so far
+        const allNotes = new Set();
+        const addNote = note => allNotes.add(note);
+        result.forEach(({blows, draws}) => {
+            blows.forEach(addNote);
+            draws.forEach(addNote);
+        });
+        // add missing overblow notes
+        result.forEach(({blows, draws}) => {
+            addOverblow = (higher, lower) => {
+                if(lower[0] < higher[0]) {
+                    const overblow = higher[0] + 1;
+                    if(!allNotes.has(overblow)) {
+                        lower.push(overblow);
+                    }
+                }
+            };
+            addOverblow(blows, draws);
+            addOverblow(draws, blows);
+        });
+        return result;
+    })();
 
     const TUNING_MAP = (()=>{
         const result = {};
@@ -19,9 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = sign + (hole + 1) + "'".repeat(overblow);
             result[id] = steps;
         };
-        RICHTER_TUNING.forEach(({blow, draw}, hole) => {
-            blow.forEach(append('+', hole));
-            draw.forEach(append('-', hole));
+        FULL_TUNING.forEach(({blows, draws}, hole) => {
+            blows.forEach(append('+', hole));
+            draws.forEach(append('-', hole));
         });
         return result;
     })();
@@ -41,8 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const sign = (value > 0) ? '+' : '-';
         const overblow = "'".repeat(Math.abs(value)-1);
         const result = [];
-        RICHTER_TUNING.forEach(({blow, draw}, idx) => {
-            if((value-1) in blow || (-value-1) in draw) {
+        FULL_TUNING.forEach(({blows, draws}, idx) => {
+            if((value-1) in blows || (-value-1) in draws) {
                 const id = sign + (idx + 1) + overblow;
                 const classes = ["note"];
                 if(id in SPECIAL_LAYOUT_CLASSES) {
@@ -265,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 getHarpPosition: function (position, hole) {
                     var classes = ['PO', 'm2', 'MJ2', 'm3', 'MJ3', 'P4', 'A4_D5_tritone', 'P5', 'm6', 'MJ6', 'm7', 'MJ7'];
                     console.log(position, hole);
-                    const steps = (TUNING_MAP[hole] + 12 * position - 7 * position) % 12;
+                    const steps = (TUNING_MAP[hole] + 5 * position) % 12;
                     console.log(steps, classes[steps]);
                     return classes[steps];
                 },//(chromatic_notes_c[note] + half_tone_steps) % 12
