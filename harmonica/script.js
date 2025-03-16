@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         {blow: [36, 35, 34], draw: [33, 37]},
     ];
 
-    const FLAT_TUNING = (()=>{
+    const TUNING_MAP = (()=>{
         const result = {};
         const append = (sign, hole) => (steps, overblow) => {
             const id = sign + (hole + 1) + "'".repeat(overblow);
@@ -25,16 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         return result;
     })();
-    
-    const LAYOUT_IDS = RICHTER_TUNING.flatMap(({blow, draw}, hole) => {
-        const result = [];
-        const pushId = sign => overblow => result.push(
-            sign + (hole + 1) + "'".repeat(overblow)
-        );
-        blow.keys().forEach(pushId('+'));
-        draw.keys().forEach(pushId('-'));
-        return result;
-    });
 
     const SPECIAL_LAYOUT_CLASSES = {
         "+10''": "bends",
@@ -62,16 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         return result;
-    };
-    
-    const LAYOUT = {
-        WSoverblow: getLayoutHoles(3),
-        HSoverblow: getLayoutHoles(2),
-        BlowNotes: getLayoutHoles(1),
-        DrawNotes: getLayoutHoles(-1),
-        HSBendNotes: getLayoutHoles(-2),
-        WSBendNotes: getLayoutHoles(-3),
-        WHSBendNotes: getLayoutHoles(-4),
     };
 
     console.log('Hello World');
@@ -176,15 +156,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             var harpcontainer = drawHelper.createHarpContainer();
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowWS"/>', harp_layout.layout.WSoverblow));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowHS"/>', harp_layout.layout.HSoverblow));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow blownotes"/>', harp_layout.layout.BlowNotes));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowWS"/>', getLayoutHoles(3)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowHS"/>', getLayoutHoles(2)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow blownotes"/>', getLayoutHoles(1)));
             drawHelper.drawHoles(harpcontainer);
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow drawnotes"/>', harp_layout.layout.DrawNotes));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendHS"/>', harp_layout.layout.HSBendNotes));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWS"/>', harp_layout.layout.WSBendNotes));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWHS"/>', harp_layout.layout.WHSBendNotes));
-
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow drawnotes"/>', getLayoutHoles(-1)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendHS"/>', getLayoutHoles(-2)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWS"/>', getLayoutHoles(-3)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWHS"/>', getLayoutHoles(-4)));
             
             return harpcontainer;
         },
@@ -286,9 +265,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 getHarpPosition: function (position, hole) {
                     var classes = ['PO', 'm2', 'MJ2', 'm3', 'MJ3', 'P4', 'A4_D5_tritone', 'P5', 'm6', 'MJ6', 'm7', 'MJ7'];
                     console.log(position, hole);
-                    console.log((harp_layout.richter_tuning_half_tone_steps[hole] + 12 * position - 7 * position) % 12,
-                        classes[(harp_layout.richter_tuning_half_tone_steps[hole] + 12 * position - 7 * position) % 12]);
-                    return classes[(harp_layout.richter_tuning_half_tone_steps[hole] + 12 * position - 7 * position) % 12];
+                    const steps = (TUNING_MAP[hole] + 12 * position - 7 * position) % 12;
+                    console.log(steps, classes[steps]);
+                    return classes[steps];
                 },//(chromatic_notes_c[note] + half_tone_steps) % 12
                 modes: harp_layout.modes,
                 getChromaticNoteByHalfToneSteps: function (note, half_tone_steps) {
@@ -298,10 +277,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     return harp_layout.chromatic_notes_array[(harp_layout.chromatic_notes_c[note] + half_tone_steps) % 12];
                 },
                 getHarpKey: function (key, position) {
-                    return LAYOUT_IDS
-                    .map(id => ({
+                    return Object.entries(TUNING_MAP)
+                    .map(([id, steps]) => ({
                             id,
-                            note: this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps[id]),
+                            note: this.getChromaticNoteByHalfToneSteps(key, steps),
                             classes: this.getHarpPosition(position, id)
                     }));
                 },
@@ -357,7 +336,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         },
-        layout: LAYOUT,
         chromatic_notes_array: ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"],
         chromatic_notes_c: {
             "C": 0,
@@ -378,7 +356,6 @@ document.addEventListener('DOMContentLoaded', () => {
             "Bb": 10,
             "B": 11
         },
-        richter_tuning_half_tone_steps: FLAT_TUNING,
         positions: [
             {
                 "id": "0",
