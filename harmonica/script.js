@@ -1,4 +1,59 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    const RICHTER_TUNING = [
+        {blow: [0, 3], draw: [2, 1]},
+        {blow: [4], draw: [7, 6, 5]},
+        {blow: [7], draw: [11, 10, 9, 8]},
+        {blow: [12, 15], draw: [14, 13]},
+        {blow: [16, 18], draw: [17]},
+        {blow: [19, 22], draw: [21, 20]},
+        {blow: [24], draw: [23, 25]},
+        {blow: [28, 27], draw: [26]},
+        {blow: [31, 30], draw: [29, 32]},
+        {blow: [36, 35, 34], draw: [33, 37]},
+    ];
+
+    const TUNING_MAP = (()=>{
+        const result = {};
+        const append = (sign, hole) => (steps, overblow) => {
+            const id = sign + (hole + 1) + "'".repeat(overblow);
+            result[id] = steps;
+        };
+        RICHTER_TUNING.forEach(({blow, draw}, hole) => {
+            blow.forEach(append('+', hole));
+            draw.forEach(append('-', hole));
+        });
+        return result;
+    })();
+
+    const SPECIAL_LAYOUT_CLASSES = {
+        "+10''": "bends",
+        "+1'": "overblow",
+        "+4'": "overblow",
+        "+5'": "overblow",
+        "+6'": "overblow",
+        "+8'": "bends",
+        "+9'": "bends",
+        "+10'": "bends",
+    };
+
+    function getLayoutHoles(value) {
+        const sign = (value > 0) ? '+' : '-';
+        const overblow = "'".repeat(Math.abs(value)-1);
+        const result = [];
+        RICHTER_TUNING.forEach(({blow, draw}, idx) => {
+            if((value-1) in blow || (-value-1) in draw) {
+                const id = sign + (idx + 1) + overblow;
+                const classes = ["note"];
+                if(id in SPECIAL_LAYOUT_CLASSES) {
+                    classes.push(SPECIAL_LAYOUT_CLASSES[id]);
+                }
+                result.push({id, idx, classes});
+            }
+        })
+        return result;
+    };
+
     console.log('Hello World');
     harp_layout = {
         init: () => {
@@ -101,15 +156,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             var harpcontainer = drawHelper.createHarpContainer();
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowWS"/>', harp_layout.layout.WSoverblow));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowHS"/>', harp_layout.layout.HSoverblow));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow blownotes"/>', harp_layout.layout.BlowNotes));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowWS"/>', getLayoutHoles(3)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowHS"/>', getLayoutHoles(2)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow blownotes"/>', getLayoutHoles(1)));
             drawHelper.drawHoles(harpcontainer);
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow drawnotes"/>', harp_layout.layout.DrawNotes));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendHS"/>', harp_layout.layout.HSBendNotes));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWS"/>', harp_layout.layout.WSBendNotes));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWHS"/>', harp_layout.layout.WHSBendNotes));
-
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow drawnotes"/>', getLayoutHoles(-1)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendHS"/>', getLayoutHoles(-2)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWS"/>', getLayoutHoles(-3)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWHS"/>', getLayoutHoles(-4)));
             
             return harpcontainer;
         },
@@ -211,9 +265,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 getHarpPosition: function (position, hole) {
                     var classes = ['PO', 'm2', 'MJ2', 'm3', 'MJ3', 'P4', 'A4_D5_tritone', 'P5', 'm6', 'MJ6', 'm7', 'MJ7'];
                     console.log(position, hole);
-                    console.log((harp_layout.richter_tuning_half_tone_steps[hole] + 12 * position - 7 * position) % 12,
-                        classes[(harp_layout.richter_tuning_half_tone_steps[hole] + 12 * position - 7 * position) % 12]);
-                    return classes[(harp_layout.richter_tuning_half_tone_steps[hole] + 12 * position - 7 * position) % 12];
+                    const steps = (TUNING_MAP[hole] + 12 * position - 7 * position) % 12;
+                    console.log(steps, classes[steps]);
+                    return classes[steps];
                 },//(chromatic_notes_c[note] + half_tone_steps) % 12
                 modes: harp_layout.modes,
                 getChromaticNoteByHalfToneSteps: function (note, half_tone_steps) {
@@ -223,14 +277,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     return harp_layout.chromatic_notes_array[(harp_layout.chromatic_notes_c[note] + half_tone_steps) % 12];
                 },
                 getHarpKey: function (key, position) {
-                    return ["B1","Db1","D1","B2","Dbb2","Db2","D2","B3","Dbbb3","Dbb3","Db3","D3","B4","D4","B5","B6","B7","B8","B9","B10","D5","D6","D7","D8","D9","D10","Db4","Db6","Db7","Db9","Db10","Bb1","Bb4","Bb5","Bb6","Bb8","Bb9","Bb10","Bbb10",]
-                    .map(id => ({id, hole: (id[0]==='B'?'+':'-') + id.replace(/[A-Za-z]+/, '') + id.replaceAll(/[BD0-9]+/g, '').replaceAll(/b/g, "'")}))
-                    .map(({id, hole}) => ({
+                    return Object.entries(TUNING_MAP)
+                    .map(([id, steps]) => ({
                             id,
-                            note: this.getChromaticNoteByHalfToneSteps(key, harp_layout.richter_tuning_half_tone_steps[hole]),
-                            classes: this.getHarpPosition(position, hole)
-                    })
-                    );
+                            note: this.getChromaticNoteByHalfToneSteps(key, steps),
+                            classes: this.getHarpPosition(position, id)
+                    }));
                 },
             }
             var position = document.getElementById('selected-position');
@@ -259,12 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
             data.getHarpKey(key, position).forEach(note => {
                 console.log('note', note);
                 var curr = document.getElementById(note.id);
-                if (!note.note) {
-                    curr.innerText = note.classes;
-                }
-                else {
-                    curr.innerText = note.note;
-                }
+                curr.innerText = note.note || note.classes;
                 curr.classList.add(note.classes);
             });
             console.log(mode);
@@ -289,57 +336,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         },
-        layout: {
-            WSoverblow: [{
-                id: 'Bbb10',
-                idx: 9,
-                classes: ["note", "bends"]
-            }],
-            HSoverblow: [
-                { id: 'Bb1', idx: 0, classes: ["note", "overblow"] },
-                { id: 'Bb4', idx: 3, classes: ["note", "overblow"] },
-                { id: 'Bb5', idx: 4, classes: ["note", "overblow"] },
-                { id: 'Bb6', idx: 5, classes: ["note", "overblow"] },
-                { id: 'Bb8', idx: 7, classes: ["note", "bends"] },
-                { id: 'Bb9', idx: 8, classes: ["note", "bends"] },
-                { id: 'Bb10', idx: 9, classes: ["note", "bends"] }],
-            BlowNotes: [
-                { id: 'B1', idx: 0, classes: ["note"] },
-                { id: 'B2', idx: 1, classes: ["note"] },
-                { id: 'B3', idx: 2, classes: ["note"] },
-                { id: 'B4', idx: 3, classes: ["note"] },
-                { id: 'B5', idx: 4, classes: ["note"] },
-                { id: 'B6', idx: 5, classes: ["note"] },
-                { id: 'B7', idx: 6, classes: ["note"] },
-                { id: 'B8', idx: 7, classes: ["note"] },
-                { id: 'B9', idx: 8, classes: ["note"] },
-                { id: 'B10', idx: 9, classes: ["note"] }],
-            DrawNotes: [
-                { id: 'D1', idx: 0, classes: ["note"] },
-                { id: 'D2', idx: 1, classes: ["note"] },
-                { id: 'D3', idx: 2, classes: ["note"] },
-                { id: 'D4', idx: 3, classes: ["note"] },
-                { id: 'D5', idx: 4, classes: ["note"] },
-                { id: 'D6', idx: 5, classes: ["note"] },
-                { id: 'D7', idx: 6, classes: ["note"] },
-                { id: 'D8', idx: 7, classes: ["note"] },
-                { id: 'D9', idx: 8, classes: ["note"] },
-                { id: 'D10', idx: 9, classes: ["note"] }],
-            HSBendNotes: [
-                { id: 'Db1', idx: 0, classes: ["note"] },
-                { id: 'Db2', idx: 1, classes: ["note"] },
-                { id: 'Db3', idx: 2, classes: ["note"] },
-                { id: 'Db4', idx: 3, classes: ["note"] },
-                { id: 'Db6', idx: 5, classes: ["note"] },
-                { id: 'Db7', idx: 6, classes: ["note"] },
-                { id: 'Db9', idx: 8, classes: ["note"] },
-                { id: 'Db10', idx: 9, classes: ["note"] }],
-            WSBendNotes: [
-                { id: 'Dbb2', idx: 1, classes: ["note"] },
-                { id: 'Dbb3', idx: 2, classes: ["note"] }],
-            WHSBendNotes: [
-                { id: 'Dbbb3', idx: 2, classes: ["note"] }],
-        },
         chromatic_notes_array: ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"],
         chromatic_notes_c: {
             "C": 0,
@@ -359,47 +355,6 @@ document.addEventListener('DOMContentLoaded', () => {
             "A#": 10,
             "Bb": 10,
             "B": 11
-        },
-        richter_tuning_half_tone_steps: {
-            "+1": 0,
-            "-1'": 1,
-            "-1": 2,
-            "+1'": 3,
-            "+2": 4,
-            "-2'": 6,
-            "-2''": 5,
-            "-2": 7,
-            "+3": 7,
-            "-3'''": 8,
-            "-3''": 9,
-            "-3'": 10,
-            "-3": 11,
-            "+4": 12,
-            "-4'": 13,
-            "-4": 14,
-            "+4'": 15,
-            "+5": 16,
-            "-5": 17,
-            "+5'": 18,
-            "+6": 19,
-            "-6'": 20,
-            "-6": 21,
-            "+6'": 22,
-            "-7": 23,
-            "+7": 24,
-            "-7'": 25,
-            "-8": 26,
-            "+8'": 27,
-            "+8": 28,
-            "-9": 29,
-            "+9'": 30,
-            "+9": 31,
-            "-9'": 32,
-            "-10": 33,
-            "+10": 36,
-            "+10'": 35,
-            "+10''": 34,
-            "-10'": 37
         },
         positions: [
             {
