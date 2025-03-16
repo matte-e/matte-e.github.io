@@ -1,25 +1,38 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const LAYOUT_SCHEME = [
-        {maxB: 2, maxD: 2},
-        {maxB: 1, maxD: 3},
-        {maxB: 1, maxD: 4},
-        {maxB: 2, maxD: 2},
-        {maxB: 2, maxD: 1},
-        {maxB: 2, maxD: 2},
-        {maxB: 1, maxD: 2},
-        {maxB: 2, maxD: 1},
-        {maxB: 2, maxD: 2},
-        {maxB: 3, maxD: 2},
+    const RICHTER_TUNING = [
+        {blow: [0, 3], draw: [2, 1]},
+        {blow: [4], draw: [7, 6, 5]},
+        {blow: [7], draw: [11, 10, 9, 8]},
+        {blow: [12, 15], draw: [14, 13]},
+        {blow: [16, 18], draw: [17]},
+        {blow: [19, 22], draw: [21, 20]},
+        {blow: [24], draw: [23, 25]},
+        {blow: [28, 27], draw: [26]},
+        {blow: [31, 30], draw: [29, 32]},
+        {blow: [36, 35, 34], draw: [33, 37]},
     ];
+
+    const FLAT_TUNING = (()=>{
+        const result = {};
+        const append = (sign, hole) => (steps, overblow) => {
+            const id = sign + (hole + 1) + "'".repeat(overblow);
+            result[id] = steps;
+        };
+        RICHTER_TUNING.forEach(({blow, draw}, hole) => {
+            blow.forEach(append('+', hole));
+            draw.forEach(append('-', hole));
+        });
+        return result;
+    })();
     
-    const LAYOUT_IDS = LAYOUT_SCHEME.flatMap(({maxB, maxD}, hole) => {
+    const LAYOUT_IDS = RICHTER_TUNING.flatMap(({blow, draw}, hole) => {
         const result = [];
         const pushId = sign => overblow => result.push(
             sign + (hole + 1) + "'".repeat(overblow)
         );
-        Array(maxB).keys().forEach(pushId('+'));
-        Array(maxD).keys().forEach(pushId('-'));
+        blow.keys().forEach(pushId('+'));
+        draw.keys().forEach(pushId('-'));
         return result;
     });
 
@@ -34,12 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
         "+10'": "bends",
     };
 
-    function getLayoutHoles(blow) {
-        const sign = (blow > 0) ? '+' : '-';
-        const overblow = "'".repeat(Math.abs(blow)-1);
+    function getLayoutHoles(value) {
+        const sign = (value > 0) ? '+' : '-';
+        const overblow = "'".repeat(Math.abs(value)-1);
         const result = [];
-        LAYOUT_SCHEME.forEach(({maxB, maxD}, idx) => {
-            if(blow <= maxB && -blow <= maxD) {
+        RICHTER_TUNING.forEach(({blow, draw}, idx) => {
+            if((value-1) in blow || (-value-1) in draw) {
                 const id = sign + (idx + 1) + overblow;
                 const classes = ["note"];
                 if(id in SPECIAL_LAYOUT_CLASSES) {
@@ -365,47 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "Bb": 10,
             "B": 11
         },
-        richter_tuning_half_tone_steps: {
-            "+1": 0,
-            "-1'": 1,
-            "-1": 2,
-            "+1'": 3,
-            "+2": 4,
-            "-2'": 6,
-            "-2''": 5,
-            "-2": 7,
-            "+3": 7,
-            "-3'''": 8,
-            "-3''": 9,
-            "-3'": 10,
-            "-3": 11,
-            "+4": 12,
-            "-4'": 13,
-            "-4": 14,
-            "+4'": 15,
-            "+5": 16,
-            "-5": 17,
-            "+5'": 18,
-            "+6": 19,
-            "-6'": 20,
-            "-6": 21,
-            "+6'": 22,
-            "-7": 23,
-            "+7": 24,
-            "-7'": 25,
-            "-8": 26,
-            "+8'": 27,
-            "+8": 28,
-            "-9": 29,
-            "+9'": 30,
-            "+9": 31,
-            "-9'": 32,
-            "-10": 33,
-            "+10": 36,
-            "+10'": 35,
-            "+10''": 34,
-            "-10'": 37
-        },
+        richter_tuning_half_tone_steps: FLAT_TUNING,
         positions: [
             {
                 "id": "0",
