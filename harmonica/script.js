@@ -51,8 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const TUNING_MAP = (()=>{
         const result = {};
-        const append = (sign, hole) => (steps, overblow) => {
-            const id = sign + (hole + 1) + "'".repeat(overblow);
+        const append = (sign, hole) => (steps, bend) => {
+            const id = sign + (hole + 1) + "'".repeat(bend);
             result[id] = steps;
         };
         FULL_TUNING.forEach(({blows, draws}, hole) => {
@@ -62,27 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return result;
     })();
 
-    const SPECIAL_LAYOUT_CLASSES = {
-        "+10''": "bends",
-        "+1'": "overblow",
-        "+4'": "overblow",
-        "+5'": "overblow",
-        "+6'": "overblow",
-        "+8'": "bends",
-        "+9'": "bends",
-        "+10'": "bends",
-    };
-
-    function getLayoutHoles(value) {
-        const sign = (value > 0) ? '+' : '-';
-        const overblow = "'".repeat(Math.abs(value)-1);
+    function getLayoutHoles(sign, bend = 0) {
         const result = [];
         FULL_TUNING.forEach(({blows, draws}, idx) => {
-            if((value-1) in blows || (-value-1) in draws) {
-                const id = sign + (idx + 1) + overblow;
+            const types = sign === '+' ? blows : draws;
+            if(bend in types) {
+                const id = sign + (idx + 1) + "'".repeat(bend);
                 const classes = ["note"];
-                if(id in SPECIAL_LAYOUT_CLASSES) {
-                    classes.push(SPECIAL_LAYOUT_CLASSES[id]);
+                if(bend) {
+                    const special_class = types[bend] < types[0] ? 'bends' : 'overblow';
+                    classes.push(special_class);
                 }
                 result.push({id, idx, classes});
             }
@@ -192,14 +181,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             var harpcontainer = drawHelper.createHarpContainer();
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowWS"/>', getLayoutHoles(3)));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowHS"/>', getLayoutHoles(2)));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow blownotes"/>', getLayoutHoles(1)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowWS"/>', getLayoutHoles('+', 2)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowHS"/>', getLayoutHoles('+', 1)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow blownotes"/>', getLayoutHoles('+')));
             drawHelper.drawHoles(harpcontainer);
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow drawnotes"/>', getLayoutHoles(-1)));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendHS"/>', getLayoutHoles(-2)));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWS"/>', getLayoutHoles(-3)));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWHS"/>', getLayoutHoles(-4)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow drawnotes"/>', getLayoutHoles('-')));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendHS"/>', getLayoutHoles('-', 1)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWS"/>', getLayoutHoles('-', 2)));
+            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWHS"/>', getLayoutHoles('-', 3)));
             
             return harpcontainer;
         },
