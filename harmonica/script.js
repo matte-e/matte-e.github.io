@@ -1,21 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const RICHTER_TUNING = [
-        { blow: 0, draw: 2},
-        { blow: 4, draw: 7},
-        { blow: 7, draw: 11},
-        { blow: 12, draw: 14},
-        { blow: 16, draw: 17},
-        { blow: 19, draw: 21},
-        { blow: 24, draw: 23},
-        { blow: 28, draw: 26},
-        { blow: 31, draw: 29},
-        { blow: 36, draw: 33},
+        [0, 2],
+        [4, 7],
+        [7, 11],
+        [12, 14],
+        [16, 17],
+        [19, 21],
+        [24, 23],
+        [28, 26],
+        [31, 29],
+        [36, 33],
     ];
 
     const FULL_TUNING = (() => {
         // add base and bend notes
-        const result = RICHTER_TUNING.map(({blow, draw}) => {
+        const result = RICHTER_TUNING.map(([blow, draw]) => {
             const blows = [blow];
             const draws = [draw];
             for(let bend = blow - 1; bend > draw; bend--) {
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         // add missing overblow notes
         result.forEach(({blows, draws}) => {
-            addOverblow = (higher, lower) => {
+            const addOverblow = (higher, lower) => {
                 if(lower[0] < higher[0]) {
                     const overblow = higher[0] + 1;
                     if(!allNotes.has(overblow)) {
@@ -65,12 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function getLayoutHoles(sign, bend = 0) {
         const result = [];
         FULL_TUNING.forEach(({blows, draws}, idx) => {
-            const types = sign === '+' ? blows : draws;
-            if(bend in types) {
+            const steps = sign === '+' ? blows : draws;
+            if(bend in steps) {
                 const id = sign + (idx + 1) + "'".repeat(bend);
                 const classes = ["note"];
                 if(bend) {
-                    const special_class = types[bend] < types[0] ? 'bends' : 'overblow';
+                    const special_class = steps[bend] < steps[0] ? 'bends' : 'overblow';
                     classes.push(special_class);
                 }
                 result.push({id, idx, classes});
@@ -287,11 +287,10 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         updateDivs() {
             const data = {
-                getHarpPosition: function (position, hole) {
+                getHarpPosition: function (position, basePositionSteps) {
                     var classes = ['PO', 'm2', 'MJ2', 'm3', 'MJ3', 'P4', 'A4_D5_tritone', 'P5', 'm6', 'MJ6', 'm7', 'MJ7'];
-                    console.log(position, hole);
-                    const steps = (TUNING_MAP[hole] + 5 * position) % 12;
-                    console.log(steps, classes[steps]);
+                    const steps = (basePositionSteps + 5 * position) % 12;
+                    console.log(position, steps, classes[steps]);
                     return classes[steps];
                 },//(chromatic_notes_c[note] + half_tone_steps) % 12
                 modes: harp_layout.modes,
@@ -306,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     .map(([id, steps]) => ({
                             id,
                             note: this.getChromaticNoteByHalfToneSteps(key, steps),
-                            classes: this.getHarpPosition(position, id)
+                            classes: this.getHarpPosition(position, steps)
                     }));
                 },
             }
