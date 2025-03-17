@@ -15,9 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
         [36, 33],
     ];
 
-    const FULL_TUNING = (() => {
+    function createFullTuning(tuning) {
         // add base and bend notes
-        const result = RICHTER_TUNING.map(([blow, draw]) => {
+        const result = tuning.map(([blow, draw]) => {
             const blows = [blow];
             const draws = [draw];
             for(let bend = blow - 1; bend > draw; bend--) {
@@ -49,24 +49,24 @@ document.addEventListener('DOMContentLoaded', () => {
             addOverblow(draws, blows);
         });
         return result;
-    })();
+    };
 
-    const TUNING_MAP = (()=>{
+    function createTuningMap(fullTuning) {
         const result = {};
         const append = (sign, hole) => (steps, bend) => {
             const id = sign + (hole + 1) + "'".repeat(bend);
             result[id] = steps;
         };
-        FULL_TUNING.forEach(({blows, draws}, hole) => {
+        fullTuning.forEach(({blows, draws}, hole) => {
             blows.forEach(append('+', hole));
             draws.forEach(append('-', hole));
         });
         return result;
-    })();
+    };
 
-    function getLayoutHoles(sign, bend = 0) {
+    function getLayoutHoles(fullTuning, sign, bend = 0) {
         const result = [];
-        FULL_TUNING.forEach(({blows, draws}, idx) => {
+        fullTuning.forEach(({blows, draws}, idx) => {
             const steps = sign === '+' ? blows : draws;
             if(bend in steps) {
                 const id = sign + (idx + 1) + "'".repeat(bend);
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             options_panel.appendChild(mode_options);
             options_panel.appendChild(keys_option);
             container.appendChild(options_panel);
-            harp_layout.drawHarp();
+            harp_layout.drawHarp(RICHTER_TUNING);
             const freeRow = createDiv('noteRow');
             freeRow.appendChild(createDiv('square'));
             container.appendChild(freeRow);
@@ -138,8 +138,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return createDiv('square');
         },
-        drawHarp: () => {
+        drawHarp: (tuning) => {
             console.log('Draw Harp');
+            const fullTuning = createFullTuning(tuning);
             var drawHelper = {
                 createHarpContainer: () => {
                     console.log('Create Harp Container');
@@ -152,16 +153,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log('Draw Hole number');
                     var row = createDiv('noteRow numbers');
                     harpcontainer.appendChild(row);
-                    for (var i = 0; i < 10; i++) {
+                    for (var i = 0; i < tuning.length; i++) {
                         var square = createDiv('square hole');
                         square.textContent = i + 1;
                         row.appendChild(square);
                     }
                 },
                 drawNotes: (sign, bend) => {
-                    const rowInfo = getLayoutHoles(sign, bend);
+                    const rowInfo = getLayoutHoles(fullTuning, sign, bend);
                     var row = createDiv('noteRow');
-                    for (var i = 0; i < 10; i++) {
+                    for (var i = 0; i < tuning.length; i++) {
                         var square = harp_layout.findByIdx(rowInfo, i);
                         row.appendChild(square);
                     }
@@ -169,15 +170,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
             }
             var harpcontainer = drawHelper.createHarpContainer();
-            harpcontainer.appendChild(drawHelper.drawNotes('+', 2));
-            harpcontainer.appendChild(drawHelper.drawNotes('+', 1));
-            harpcontainer.appendChild(drawHelper.drawNotes('+'));
+            const maxBlow = Math.max(...fullTuning.map(({blows}) => blows.length));
+            const maxDraw = Math.max(...fullTuning.map(({draws}) => draws.length));
+            for (let blow = maxBlow - 1; blow >= 0; blow--) {
+                harpcontainer.appendChild(drawHelper.drawNotes('+', blow));
+            }
             drawHelper.drawHoles(harpcontainer);
-            harpcontainer.appendChild(drawHelper.drawNotes('-'));
-            harpcontainer.appendChild(drawHelper.drawNotes('-', 1));
-            harpcontainer.appendChild(drawHelper.drawNotes('-', 2));
-            harpcontainer.appendChild(drawHelper.drawNotes('-', 3));
-            
+            for(let draw = 0; draw < maxDraw; draw++) {
+                harpcontainer.appendChild(drawHelper.drawNotes('-', draw));
+            }
             return harpcontainer;
         },
         drawOptions: (dropdown_info) => {
@@ -274,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
             harp_layout.updateDivs();
         },
         updateDivs() {
+            const tuningMap = createTuningMap(createFullTuning(RICHTER_TUNING));
             const data = {
                 getHarpPosition: function (position, basePositionSteps) {
                     var classes = ['PO', 'm2', 'MJ2', 'm3', 'MJ3', 'P4', 'A4_D5', 'P5', 'm6', 'MJ6', 'm7', 'MJ7'];
@@ -289,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return harp_layout.chromatic_notes_array[(harp_layout.chromatic_notes_c[note] + half_tone_steps) % 12];
                 },
                 getHarpKey: function (key, position) {
-                    return Object.entries(TUNING_MAP)
+                    return Object.entries(tuningMap)
                     .map(([id, steps]) => ({
                             id,
                             note: this.getChromaticNoteByHalfToneSteps(key, steps),
