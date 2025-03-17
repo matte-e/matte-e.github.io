@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    const INTERVAL_NAMES = ['PO', 'm2', 'MJ2', 'm3', 'MJ3', 'P4', 'A4_D5', 'P5', 'm6', 'MJ6', 'm7', 'MJ7'];
+
     const RICHTER_TUNING = [
         [0, 2],
         [4, 7],
@@ -79,12 +81,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return result;
     };
 
+    function createDiv(classes, id) {
+        const result = document.createElement('div');
+        result.id = id;
+        result.setAttribute('class', classes);
+        return result;
+    }
+
     console.log('Hello World');
     harp_layout = {
         init: () => {
             console.log('Harp Layout');
             var container = document.getElementById('container');
-            var options_panel = harp_layout.htmlToNodes('<div id="options" class="noteRow"></div>')[0];
+            var options_panel = createDiv('noteRow', 'options');
             var position_options = harp_layout.drawOptions({
                 id: 'position',
                 label: 'Position:',
@@ -107,41 +116,27 @@ document.addEventListener('DOMContentLoaded', () => {
             options_panel.appendChild(keys_option);
             container.appendChild(options_panel);
             harp_layout.drawHarp();
-            var legend = harp_layout.htmlToNodes(`<div class="noteRow">
-                <div class="square"></div></div>
-                <div class="noteRow">
-                <div class="square note PO">Root</div>
-                <div class="square note m2">m2</div>
-                <div class="square note MJ2">M2</div>
-                <div class="square note m3">m3</div>
-                <div class="square note MJ3">M3</div>
-                <div class="square note P4">P4</div>
-                <div class="square note A4_D5_tritone">A4/D5</div>
-                <div class="square note P5">P5</div>
-                <div class="square note m6">m6</div>
-                <div class="square note MJ6">M6</div>
-                <div class="square note m7">m7</div>
-                <div class="square note MJ7">M7</div>
-                <div class="square note PO">P8</div>
-                </div>`);
-            legend.forEach(l => 
-                container.appendChild(l));
+            const freeRow = createDiv('noteRow');
+            freeRow.appendChild(createDiv('square'));
+            container.appendChild(freeRow);
+            const legend = createDiv('noteRow');
+            INTERVAL_NAMES.forEach(interval => {
+                const div = createDiv('square note ' + interval);
+                div.textContent = interval;
+                legend.appendChild(div);
+            });
+            container.appendChild(legend);
             harp_layout.selectMode(harp_layout.modes[0]);
             harp_layout.selectPosition(harp_layout.positions[0]);
             harp_layout.selectKey('interval');
-        },
-        htmlToNodes: (html) => {
-            const template = document.createElement('template');
-            template.innerHTML = html;
-            return template.content.childNodes;
         },
         findByIdx: (arr, idx) => {
             var obj = arr.find(item => item.idx === idx)
                 || null;
             if (obj != null) {
-                return harp_layout.htmlToNodes(`<div id="${obj.id}" class="square ${obj.classes.join(' ')}"></div>`)[0]
+                return createDiv(`square ${obj.classes.join(' ')}`, obj.id);
             }
-            return harp_layout.htmlToNodes('<div class="square"></div>')[0]
+            return createDiv('square');
         },
         drawHarp: () => {
             console.log('Draw Harp');
@@ -149,59 +144,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 createHarpContainer: () => {
                     console.log('Create Harp Container');
                     var container = document.getElementById('container');
-                    var harpcontainer = harp_layout
-                        .htmlToNodes('<div id="harpcontainer" class="harpcontainer"></div>')[0];
+                    var harpcontainer = createDiv('harpcontainer', 'harpcontainer');
                     container.appendChild(harpcontainer);
                     return harpcontainer;
                 },
                 drawHoles: (harpcontainer) => {
                     console.log('Draw Hole number');
-                    var row = harp_layout
-                        .htmlToNodes('<div class="noteRow numbers"></div>')[0];
+                    var row = createDiv('noteRow numbers');
                     harpcontainer.appendChild(row);
                     for (var i = 0; i < 10; i++) {
-                        var square = harp_layout
-                            .htmlToNodes(`<div class="square hole">${i + 1}</div>`)[0];
+                        var square = createDiv('square hole');
+                        square.textContent = i + 1;
                         row.appendChild(square);
                     }
                 },
-                drawNotes: (div, rowInfo) => {
-                    var row = harp_layout
-                        .htmlToNodes(div)[0];
-                    drawHelper.fillRow(row, rowInfo);
-                    return row;
-                },
-                fillRow: (row, rowInfo) => {
-                    console.log('Fill Row');
+                drawNotes: (sign, bend) => {
+                    const rowInfo = getLayoutHoles(sign, bend);
+                    var row = createDiv('noteRow');
                     for (var i = 0; i < 10; i++) {
                         var square = harp_layout.findByIdx(rowInfo, i);
                         row.appendChild(square);
                     }
-
-                }
+                    return row;
+                },
             }
             var harpcontainer = drawHelper.createHarpContainer();
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowWS"/>', getLayoutHoles('+', 2)));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow overblowHS"/>', getLayoutHoles('+', 1)));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow blownotes"/>', getLayoutHoles('+')));
+            harpcontainer.appendChild(drawHelper.drawNotes('+', 2));
+            harpcontainer.appendChild(drawHelper.drawNotes('+', 1));
+            harpcontainer.appendChild(drawHelper.drawNotes('+'));
             drawHelper.drawHoles(harpcontainer);
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow drawnotes"/>', getLayoutHoles('-')));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendHS"/>', getLayoutHoles('-', 1)));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWS"/>', getLayoutHoles('-', 2)));
-            harpcontainer.appendChild(drawHelper.drawNotes('<div class="noteRow bendWHS"/>', getLayoutHoles('-', 3)));
+            harpcontainer.appendChild(drawHelper.drawNotes('-'));
+            harpcontainer.appendChild(drawHelper.drawNotes('-', 1));
+            harpcontainer.appendChild(drawHelper.drawNotes('-', 2));
+            harpcontainer.appendChild(drawHelper.drawNotes('-', 3));
             
             return harpcontainer;
         },
         drawOptions: (dropdown_info) => {
             console.log('Draw Options');
-            return harp_layout.htmlToNodes(
-                `<div>
+            const result = createDiv();
+            result.innerHTML = `
                     <label class="dropdown_label" for="${dropdown_info.id}">${dropdown_info.label}</label>
                     <div class="dropdown" id="${dropdown_info.id}">
                         <div id="${dropdown_info.id}" class="dropdown-button" onclick="harp_layout.toggleDropdown_${dropdown_info.id}()"></div>
                         <div class="dropdown-content" id="dropdown-content-${dropdown_info.id}"></div>
-                    </div>
-                </div>`)[0];
+                    </div>`;
+            return result;
         },
         toggleDropdown_mode: () => {
             const dropdown = document.getElementById(`dropdown-content-mode`);
@@ -288,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDivs() {
             const data = {
                 getHarpPosition: function (position, basePositionSteps) {
-                    var classes = ['PO', 'm2', 'MJ2', 'm3', 'MJ3', 'P4', 'A4_D5_tritone', 'P5', 'm6', 'MJ6', 'm7', 'MJ7'];
+                    var classes = ['PO', 'm2', 'MJ2', 'm3', 'MJ3', 'P4', 'A4_D5', 'P5', 'm6', 'MJ6', 'm7', 'MJ7'];
                     const steps = (basePositionSteps + 5 * position) % 12;
                     console.log(position, steps, classes[steps]);
                     return classes[steps];
@@ -328,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Clear previous intervals
             console.log('clearing intervals');
             document.getElementById('harpcontainer').querySelectorAll('.square').forEach(div => {
-                div.classList.remove('PO', 'm2', 'MJ2', 'm3', 'MJ3', 'P4', 'A4_D5_tritone', 'P5', 'm6', 'MJ6', 'm7', 'MJ7', 'highlight');
+                div.classList.remove('PO', 'm2', 'MJ2', 'm3', 'MJ3', 'P4', 'A4_D5', 'P5', 'm6', 'MJ6', 'm7', 'MJ7', 'highlight');
             });
             //select key
             console.log('selecting key');
@@ -488,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 "name": "Lydian",
                 "synonyms": ["Lydian"],
                 "formula": [2, 2, 2, 1, 2, 2, 1],
-                "interval": ["MJ2", "MJ3", "A4_D5_tritone", "P5", "MJ6", "MJ7", "PO"]
+                "interval": ["MJ2", "MJ3", "A4_D5", "P5", "MJ6", "MJ7", "PO"]
             },
             {
                 "id": "mixolydian",
@@ -509,14 +497,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 "name": "Locrian",
                 "synonyms": ["Locrian"],
                 "formula": [1, 2, 2, 1, 2, 2, 2],
-                "interval": ["m2", "m3", "P4", "A4_D5_tritone", "m6", "m7", "PO"]
+                "interval": ["m2", "m3", "P4", "A4_D5", "m6", "m7", "PO"]
             },
             {
                 "id": "blues",
                 "name": "Blues",
                 "synonyms": ["Blues"],
                 "formula": [3, 2, 1, 1, 3, 2],
-                "interval": ["PO", "m3", "P4", "A4_D5_tritone", "P5", "m7"]
+                "interval": ["PO", "m3", "P4", "A4_D5", "P5", "m7"]
             },
             {
                 "id": "noScale",
@@ -530,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 "name": "Chromatic",
                 "synonyms": ["Chromatic"],
                 "formula": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                "interval": ["PO", "m2", "MJ2", "m3", "MJ3", "P4", "A4_D5_tritone", "P5", "m6", "MJ6", "m7", "MJ7"]
+                "interval": ["PO", "m2", "MJ2", "m3", "MJ3", "P4", "A4_D5", "P5", "m6", "MJ6", "m7", "MJ7"]
             },
             {
                 "id": "bebop_dominant_scale",
@@ -558,21 +546,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 "name": "Double Harmonic Minor",
                 "synonyms": ["Double Harmonic Minor"],
                 "formula": [1, 3, 1, 2, 1, 3, 1],
-                "interval": ["PO", "m2", "m3", "P4", "A4_D5_tritone", "m6", "m7", "PO"]
+                "interval": ["PO", "m2", "m3", "P4", "A4_D5", "m6", "m7", "PO"]
             },
             {
                 "id": "gypsy_minor_scale",
                 "name": "Gypsy Minor",
                 "synonyms": ["Gypsy Minor"],
                 "formula": [1, 3, 1, 2, 1, 3, 1],
-                "interval": ["PO", "m2", "m3", "P4", "A4_D5_tritone", "m6", "m7", "PO"]
+                "interval": ["PO", "m2", "m3", "P4", "A4_D5", "m6", "m7", "PO"]
             },
             {
                 "id": "half_whole_diminished_scale",
                 "name": "Half-Whole Diminished",
                 "synonyms": ["Half-Whole Diminished"],
                 "formula": [1, 2, 1, 2, 1, 2, 1, 2],
-                "interval": ["PO", "m2", "m3", "P4", "A4_D5_tritone", "m6", "m7", "PO"]
+                "interval": ["PO", "m2", "m3", "P4", "A4_D5", "m6", "m7", "PO"]
             },
             {
                 "id": "harmonic_major_scale",
@@ -593,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 "name": "Hungarian Minor",
                 "synonyms": ["Hungarian Minor"],
                 "formula": [2, 1, 3, 1, 1, 3, 1],
-                "interval": ["PO", "MJ2", "m3", "P4", "A4_D5_tritone", "m6", "m7", "PO"]
+                "interval": ["PO", "MJ2", "m3", "P4", "A4_D5", "m6", "m7", "PO"]
             },
             {
                 "id": "major_pentatonic_scale",
