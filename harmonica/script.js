@@ -14,6 +14,30 @@ document.addEventListener('DOMContentLoaded', () => {
         [31, 29],
         [36, 33],
     ];
+    const NATURAL_MINOR_TUNING = [
+        [0, 2],
+        [3, 7],
+        [7, 10],
+        [12, 14],
+        [15, 17],
+        [19, 21],
+        [24, 22],
+        [27, 26],
+        [31, 29],
+        [36, 33],
+    ];
+    const HARMONIC_MINOR_TUNING = [
+        [0, 2],
+        [3, 7],
+        [7, 11],
+        [12, 14],
+        [15, 17],
+        [19, 20],
+        [24, 23],
+        [27, 26],
+        [31, 29],
+        [36, 32],
+    ];
 
     function createFullTuning(tuning) {
         // add base and bend notes
