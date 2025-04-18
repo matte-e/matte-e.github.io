@@ -39,6 +39,30 @@ document.addEventListener('DOMContentLoaded', () => {
         [36, 32],
     ];
 
+    /**
+     * Get strings from an array based on accumulated indices
+     * @param {Array<string>} strings - Array of strings to select from
+     * @param {Array<number>} indices - Array of indices to accumulate
+     * @returns {Array<string>} - Array of selected strings
+     */
+    function getStringsByIndices(strings, indices) {
+        const result = [];        
+        for (const offset of indices) {
+            if (offset < strings.length) {
+                result.push(strings[offset]);
+            }
+        }
+        
+        return result;
+    }
+
+    function calcScale(interval) {
+        const steps = [0];
+        for (let i = 0; i < interval.length; i++) {
+            steps.push(steps.at(-1) + interval[i]);
+        }
+        return getStringsByIndices(INTERVAL_NAMES,steps);
+    }
     function createFullTuning(tuning) {
         // add base and bend notes
         const result = tuning.map(([blow, draw]) => {
@@ -304,7 +328,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 getHarpPosition: function (position, basePositionSteps) {
                     var classes = ['PO', 'm2', 'MJ2', 'm3', 'MJ3', 'P4', 'A4_D5', 'P5', 'm6', 'MJ6', 'm7', 'MJ7'];
                     const steps = (basePositionSteps + 5 * position) % 12;
-                    console.log(position, steps, classes[steps]);
                     return classes[steps];
                 },//(chromatic_notes_c[note] + half_tone_steps) % 12
                 modes: harp_layout.modes,
@@ -347,14 +370,10 @@ document.addEventListener('DOMContentLoaded', () => {
             //select key
             console.log('selecting key');
             data.getHarpKey(key, position).forEach(note => {
-                console.log('note', note);
                 var curr = document.getElementById(note.id);
                 curr.innerText = note.note || note.classes;
                 curr.classList.add(note.classes);
             });
-            console.log(mode);
-            // console.log(JSON.parse(mode));
-
             harp_layout.updateHighlight(mode);
             console.log('done');
         },
@@ -479,158 +498,122 @@ document.addEventListener('DOMContentLoaded', () => {
             {
                 "id": "ionian",
                 "name": "Ionian",
-                "synonyms": ["Major", "Ionian"],
-                "formula": [2, 2, 1, 2, 2, 2, 1],
-                "interval": ["PO", "MJ2", "MJ3", "P4", "P5", "MJ6", "MJ7"]
+                "formula": [2, 2, 1, 2, 2, 2, 1]
             },
             {
                 "id": "dorian",
                 "name": "Dorian",
-                "synonyms": ["Dorian"],
-                "formula": [2, 1, 2, 2, 2, 1, 2],
-                "interval": ["PO", "MJ2", "m3", "P4", "P5", "MJ6", "m7"]
+                "formula": [2, 1, 2, 2, 2, 1, 2]
             },
             {
                 "id": "phrygian",
                 "name": "Phrygian",
-                "synonyms": ["Phrygian"],
-                "formula": [1, 2, 2, 2, 1, 2, 2],
-                "interval": ["m2", "m3", "P4", "P5", "m6", "m7", "PO"]
+                "formula": [1, 2, 2, 2, 1, 2, 2]
             },
             {
                 "id": "lydian",
                 "name": "Lydian",
-                "synonyms": ["Lydian"],
-                "formula": [2, 2, 2, 1, 2, 2, 1],
-                "interval": ["MJ2", "MJ3", "A4_D5", "P5", "MJ6", "MJ7", "PO"]
+                "formula": [2, 2, 2, 1, 2, 2, 1]
             },
             {
                 "id": "mixolydian",
                 "name": "Mixolydian",
-                "synonyms": ["Mixolydian"],
-                "formula": [2, 2, 1, 2, 2, 1, 2],
-                "interval": ["MJ2", "MJ3", "P4", "P5", "MJ6", "m7", "PO"]
+                "formula": [2, 2, 1, 2, 2, 1, 2]
             },
             {
                 "id": "aeolian",
                 "name": "Aeolian",
                 "synonyms": ["Aeolian"],
-                "formula": [2, 1, 2, 2, 1, 2, 2],
-                "interval": ["PO", "MJ2", "m3", "P4", "P5", "m6", "m7"]
+                "formula": [2, 1, 2, 2, 1, 2, 2]
             },
             {
                 "id": "locrian",
                 "name": "Locrian",
-                "synonyms": ["Locrian"],
-                "formula": [1, 2, 2, 1, 2, 2, 2],
-                "interval": ["m2", "m3", "P4", "A4_D5", "m6", "m7", "PO"]
+                "formula": [1, 2, 2, 1, 2, 2, 2]
             },
             {
                 "id": "blues",
                 "name": "Blues",
-                "synonyms": ["Blues"],
-                "formula": [3, 2, 1, 1, 3, 2],
-                "interval": ["PO", "m3", "P4", "A4_D5", "P5", "m7"]
+                "formula": [3, 2, 1, 1, 3, 2]
             },
             {
                 "id": "noScale",
                 "name": "No Scale",
-                "synonyms": ["No Scale"],
                 "formula": [],
-                "interval": []
             },
             {
                 "id": "chromatic_scale",
                 "name": "Chromatic",
-                "synonyms": ["Chromatic"],
-                "formula": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                "interval": ["PO", "m2", "MJ2", "m3", "MJ3", "P4", "A4_D5", "P5", "m6", "MJ6", "m7", "MJ7"]
+                "formula": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
             },
             {
                 "id": "bebop_dominant_scale",
                 "name": "Bebop Dominant",
-                "synonyms": ["Bebop Dominant"],
-                "formula": [2, 2, 1, 2, 1, 1, 1, 2],
-                "interval": ["PO", "MJ2", "MJ3", "P4", "P5", "MJ6", "m7", "PO"]
+                "formula": [2, 2, 1, 2, 1, 1, 1, 2]
             },
             {
                 "id": "bebop_major_scale",
                 "name": "Bebop Major",
-                "synonyms": ["Bebop Major"],
-                "formula": [2, 2, 1, 2, 1, 1, 2, 1],
-                "interval": ["PO", "MJ2", "MJ3", "P4", "P5", "MJ6", "MJ7", "PO"]
+                "formula": [2, 2, 1, 2, 1, 1, 2, 1]
             },
             {
                 "id": "dominant_scale",
                 "name": "Dominant",
-                "synonyms": ["Dominant"],
-                "formula": [2, 2, 1, 2, 2, 1, 2],
-                "interval": ["PO", "MJ2", "MJ3", "P4", "P5", "MJ6", "m7", "PO"]
+                "formula": [2, 2, 1, 2, 2, 1, 2]
             },
             {
                 "id": "double_harmonic_minor_scale",
                 "name": "Double Harmonic Minor",
-                "synonyms": ["Double Harmonic Minor"],
-                "formula": [1, 3, 1, 2, 1, 3, 1],
-                "interval": ["PO", "m2", "m3", "P4", "A4_D5", "m6", "m7", "PO"]
+                "formula": [1, 3, 1, 2, 1, 3, 1]
             },
             {
                 "id": "gypsy_minor_scale",
                 "name": "Gypsy Minor",
-                "synonyms": ["Gypsy Minor"],
-                "formula": [1, 3, 1, 2, 1, 3, 1],
-                "interval": ["PO", "m2", "m3", "P4", "A4_D5", "m6", "m7", "PO"]
+                "formula": [1, 3, 1, 2, 1, 3, 1]
             },
             {
                 "id": "half_whole_diminished_scale",
                 "name": "Half-Whole Diminished",
-                "synonyms": ["Half-Whole Diminished"],
-                "formula": [1, 2, 1, 2, 1, 2, 1, 2],
-                "interval": ["PO", "m2", "m3", "P4", "A4_D5", "m6", "m7", "PO"]
+                "formula": [1, 2, 1, 2, 1, 2, 1, 2]
             },
             {
                 "id": "harmonic_major_scale",
                 "name": "Harmonic Major",
-                "synonyms": ["Harmonic Major"],
-                "formula": [2, 2, 1, 2, 1, 3, 1],
-                "interval": ["PO", "MJ2", "MJ3", "P4", "P5", "m6", "m7", "PO"]
+                "formula": [2, 2, 1, 2, 1, 3, 1]
             },
             {
                 "id": "harmonic_minor_scale",
                 "name": "Harmonic Minor",
-                "synonyms": ["Harmonic Minor"],
-                "formula": [2, 1, 2, 2, 1, 3, 1],
-                "interval": ["PO", "MJ2", "m3", "P4", "P5", "m6", "m7", "PO"]
+                "formula": [2, 1, 2, 2, 1, 3, 1]
             },
             {
                 "id": "hungarian_minor_scale",
                 "name": "Hungarian Minor",
-                "synonyms": ["Hungarian Minor"],
-                "formula": [2, 1, 3, 1, 1, 3, 1],
-                "interval": ["PO", "MJ2", "m3", "P4", "A4_D5", "m6", "m7", "PO"]
+                "formula": [2, 1, 3, 1, 1, 3, 1]
             },
             {
                 "id": "major_pentatonic_scale",
                 "name": "Major Pentatonic",
-                "synonyms": ["Major Pentatonic"],
-                "formula": [2, 2, 3, 2, 3],
-                "interval": ["PO", "MJ2", "MJ3", "P5", "MJ6", "PO"]
+                "formula": [2, 2, 3, 2, 3]
             },
             {
                 "id": "melodic_minor_scale",
                 "name": "Melodic Minor",
-                "synonyms": ["Melodic Minor"],
-                "formula": [2, 1, 2, 2, 2, 2, 1],
-                "interval": ["PO", "MJ2", "m3", "P4", "P5", "MJ6", "MJ7", "PO"]
+                "formula": [2, 1, 2, 2, 2, 2, 1]
             },
             {
                 "id": "minor_pentatonic_scale",
                 "name": "Minor Pentatonic",
-                "synonyms": ["Minor Pentatonic"],
-                "formula": [3, 2, 2, 3, 2],
-                "interval": ["PO", "m3", "P4", "P5", "m7", "PO"]
+                "formula": [3, 2, 2, 3, 2]
             }
-        ]
+        ].map(({id, name, synonyms, formula, interval}) => ({
+            id,
+            name,
+            synonyms,
+            formula,
+            interval: calcScale(formula)
+            // intervalFormula: calcScale(formula)
+        }))
     };
     harp_layout.init();
 });
